@@ -70,6 +70,7 @@ basedir="$( cd "$( dirname "${_source}" )" && cd .. && pwd )"
 
 TMPDIR=${TMPDIR:-/tmp}
 VAULT_BASE_PATH="${BUILDKITE_PLUGIN_VAULT_SECRETS_PATH:-data/buildkite}"
+echo "vault base path is: $VAULT_BASE_PATH"
 
 # Check for a custom secret key from plugin config
 if [[ -n "${BUILDKITE_PLUGIN_VAULT_SECRETS_SECRET:-}" ]]; then
@@ -83,9 +84,13 @@ export VAULT_NAMESPACE="${BUILDKITE_PLUGIN_VAULT_SECRETS_NAMESPACE:-admin}"
 echo "Using namespace: $VAULT_NAMESPACE"
 
 vault_server="${BUILDKITE_PLUGIN_VAULT_SECRETS_SERVER:-}"
+echo "Vault server is: $vault_server"
+
 vault_path="${VAULT_BASE_PATH:-}"
 [ -n "${BUILDKITE_PLUGIN_VAULT_SECRETS_PREFIX:-}" ] && vault_path="${vault_path}/${BUILDKITE_PLUGIN_VAULT_SECRETS_PREFIX}"
 [ -n "${BUILDKITE_PIPELINE_SLUG:-}" ] && vault_path="${vault_path}/${BUILDKITE_PIPELINE_SLUG}"
+
+echo "Vault path is: $vault_path"
 
 if [[ -n "$vault_server" ]] ; then
   echo "~~~ Authenticating to :vault: $vault_server" >&2;
@@ -98,6 +103,7 @@ if [[ -n "$vault_server" ]] ; then
     "${VAULT_BASE_PATH}"
   )
 
+  echo "Secret Path is: $secret_paths"
   secrets=''
   for key in "${secret_paths[@]}" ; do
     echo "Checking vault secrets ${key}" >&2
